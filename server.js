@@ -4,71 +4,153 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 
-// 1. Landing Page HTML đẹp mắt cho Trang chủ
+
 app.get('/', (req, res) => {
     res.send(`
         <!DOCTYPE html>
-        <html lang="vi">
+        <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>My Express API Dashboard</title>
+            <title>Express API Dashboard</title>
             <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+            <style>
+                body { font-family: 'Plus Jakarta Sans', sans-serif; }
+            </style>
         </head>
-        <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
-            <div class="max-w-lg w-full bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-2xl text-center space-y-4">
-                <div class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-bold border border-emerald-500/20">
-                    🟢 API Status: ONLINE
-                </div>
-                <h1 class="text-3xl font-black text-indigo-400">Express API Service</h1>
-                <p class="text-slate-400 text-sm">Hệ thống Backend RESTful API</p>
+        <body class="bg-slate-50 text-slate-800 min-h-screen py-10 px-4 flex items-center justify-center">
+            <div class="max-w-2xl w-full bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/60 border border-slate-100 space-y-8">
                 
-                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 text-xs text-left space-y-1">
-                    <p><span class="text-slate-400 font-semibold">Sinh viên:</span> Nguyen Thi Cam Phung</p>
-                    <p><span class="text-slate-400 font-semibold">MSSV:</span> 25560047</p>
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold border border-emerald-200/60 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Service Active
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Express API Portal</h1>
+                        <p class="text-slate-500 text-sm mt-0.5">RESTful Web Services & Interactive Playground</p>
+                    </div>
                 </div>
 
-                <div class="text-left space-y-2">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Danh sách API Endpoints:</h2>
-                    <ul class="text-xs space-y-2 font-mono">
-                        <li class="bg-slate-900 p-2 rounded border border-slate-700/50 flex justify-between items-center">
-                            <span class="text-emerald-400 font-bold">GET</span>
-                            <a href="/api/info" class="text-indigo-300 hover:underline">/api/info</a>
-                        </li>
-                        <li class="bg-slate-900 p-2 rounded border border-slate-700/50 flex justify-between items-center">
-                            <span class="text-amber-400 font-bold">GET</span>
-                            <a href="/api/fortune" class="text-indigo-300 hover:underline">/api/fortune</a>
-                        </li>
-                    </ul>
+                <!-- Student Info Card -->
+                <div class="bg-indigo-50/60 rounded-2xl p-5 border border-indigo-100/80 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider">Developer Profile</p>
+                        <p class="text-base font-bold text-slate-800 mt-0.5">Nguyen Thi Cam Phung</p>
+                    </div>
+                    <div class="sm:text-right">
+                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-wider">Student ID</p>
+                        <p class="text-sm font-semibold text-slate-700 font-mono bg-white px-3 py-1 rounded-lg border border-indigo-100 shadow-sm inline-block mt-0.5">25560047</p>
+                    </div>
                 </div>
+
+                <!-- Interactive Mini Game Section -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-lg shadow-slate-900/10 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                🎲 Lucky Draw Simulator
+                            </h2>
+                            <p class="text-xs text-slate-400">Test the <code class="text-indigo-300">/api/fortune</code> endpoint directly below</p>
+                        </div>
+                    </div>
+
+                    <div id="game-display" class="bg-slate-800/80 rounded-xl p-4 text-center border border-slate-700/60 min-h-[90px] flex items-center justify-center">
+                        <p class="text-slate-400 text-sm italic">Click the button below to draw your prize!</p>
+                    </div>
+
+                    <button onclick="playMiniGame()" id="draw-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md shadow-indigo-600/30 flex items-center justify-center gap-2 active:scale-[0.99]">
+                        <span>Draw Fortune</span> 🚀
+                    </button>
+                </div>
+
+                <!-- API Endpoints List -->
+                <div class="space-y-3">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Available API Endpoints</h2>
+                    <div class="space-y-2">
+                        <div class="p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200/60 flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-md">GET</span>
+                                <a href="/api/info" target="_blank" class="text-sm font-mono font-semibold text-slate-700 group-hover:text-indigo-600">/api/info</a>
+                            </div>
+                            <span class="text-xs text-slate-400">Student Metadata</span>
+                        </div>
+                        <div class="p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200/60 flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-md">GET</span>
+                                <a href="/api/fortune" target="_blank" class="text-sm font-mono font-semibold text-slate-700 group-hover:text-indigo-600">/api/fortune</a>
+                            </div>
+                            <span class="text-xs text-slate-400">Random Game API</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- Frontend JavaScript for Mini-game -->
+            <script>
+                async function playMiniGame() {
+                    const btn = document.getElementById('draw-btn');
+                    const display = document.getElementById('game-display');
+                    
+                    btn.disabled = true;
+                    btn.classList.add('opacity-75');
+                    display.innerHTML = '<p class="text-indigo-300 text-sm animate-pulse font-medium">Drawing fortune from server...</p>';
+
+                    try {
+                        const response = await fetch('/api/fortune');
+                        const result = await response.json();
+                        
+                        if (result.status === 'success') {
+                            const data = result.data;
+                            display.innerHTML = \`
+                                <div class="space-y-1 animate-fadeIn">
+                                    <div class="text-2xl">\${data.emoji}</div>
+                                    <p class="text-sm font-bold text-white">\${data.prize}</p>
+                                    <p class="text-xs font-mono text-emerald-400">+\${data.points} PTS Awarded</p>
+                                </div>
+                            \`;
+                        }
+                    } catch (error) {
+                        display.innerHTML = '<p class="text-rose-400 text-sm font-medium">Failed to connect to API server.</p>';
+                    } finally {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-75');
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
 });
 
-// 2. Route thông tin sinh viên
+
 app.get('/api/info', (req, res) => {
     res.json({
         status: "success",
-        student: "Nguyen Thi Cam Phung",
-        id: "25560047",
-        course: "CSBU109 - Web Development",
+        developer: {
+            fullName: "Nguyen Thi Cam Phung",
+            studentId: "25560047",
+            
+        },
+        application: "Express API Service",
+        environment: process.env.NODE_ENV || "development",
         timestamp: new Date().toISOString()
     });
 });
 
-// 3. Route Mini-Game Xổ số / May mắn ngẫu nhiên
+
 app.get('/api/fortune', (req, res) => {
     const prizes = [
-        { emoji: '🏇', text: 'Bạch mã hoàng tử (+350 PTS)', points: 350 },
-        { emoji: '🎟️', text: 'Vé xem xiếc may mắn (+100 PTS)', points: 100 },
-        { emoji: '🎰', text: 'Giải độc đắc Jackpot (+500 PTS)', points: 500 },
-        { emoji: '🎪', text: 'Chúc bạn may mắn lần sau (0 PTS)', points: 0 }
+        { emoji: '🏇', prize: 'Grand White Stallion', points: 350 },
+        { emoji: '🎟️', prize: 'Lucky Circus Ticket', points: 100 },
+        { emoji: '🎰', prize: 'Jackpot Prize Winner', points: 500 },
+        { emoji: '🎪', prize: 'Better Luck Next Time', points: 0 }
     ];
     const result = prizes[Math.floor(Math.random() * prizes.length)];
     res.json({
@@ -77,14 +159,14 @@ app.get('/api/fortune', (req, res) => {
     });
 });
 
-// 4. Handle lỗi 404 (Route không tồn tại)
+
 app.use((req, res) => {
     res.status(404).json({
         status: "error",
-        message: "Endpoint không tồn tại trên hệ thống!"
+        message: "Endpoint not found on this server."
     });
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
